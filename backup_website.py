@@ -25,7 +25,7 @@ def open_config_file(yaml_file):
     sys.exit(1)
   except:
     print("YAML file: Unexpected error: ", sys.exc_info()[0])
-    sys.exit(2) 
+    sys.exit(1) 
 
   return name_list
 
@@ -36,7 +36,7 @@ def walk_error_handler(exception_instance):
   print("Error : "+str(exception_instance))
   if int(value_it) == 1:
     print("Arrêt de la sauvegarde")
-    sys.exit(3)
+    sys.exit(2)
   else:
     print("Erreur ignorée, la création continue.")
 
@@ -58,10 +58,10 @@ def create_archive(name_list):
     tar = tarfile.open((name_list["web_configuration"]["tarfile"])+d1+ext, arch_mode)
   except tarfile.CompressionError:
     print("Compression method is not supported or data cannot be decoded properly, script is stoped.")
-    sys.exit(4)
+    sys.exit(3)
   except:
     print("ARCHIVE CREATION : Unexpected error: ", sys.exc_info()[0])
-    sys.exit(5) 
+    sys.exit(4) 
 
   # Boucle pour ajouter les fichiers et sous-dossiers du wordpress à l"archive
   print("Archive créée ! Récupération des données...")
@@ -98,7 +98,7 @@ def create_dump(name_list):
 
   if (datacode.returncode != 0):
     print("Erreur lors de la création du dump, datacode error : %d" % datacode.returncode)
-    sys.exit(6)
+    sys.exit(5)
 
   final_dump.close()
   print("Dump Créé.") 
@@ -124,13 +124,13 @@ def export_backup(name_list, tar):
     output = check_output(["scp", fichier, user+"@"+ip_addr+":"+directory], stderr=STDOUT, timeout=30)
   except subprocess.CalledProcessError:
     print("Erreur lors de l'export du backup vers "+ip_addr)
-    sys.exit(7)
+    sys.exit(6)
   except subprocess.TimeoutExpired:
     print("Erreur : Timeout lors de l'export du backup vers "+ip_addr)
-    sys.exit(8)
+    sys.exit(7)
   except:
     print("Failure")
-    sys.exit(9)
+    sys.exit(6)
 
 
 #-----------------------------------------------------------------------------#
@@ -147,7 +147,7 @@ if __name__ == "__main__":
   # Test si il n'y a pas d'arguments ou pas assez
   if len(sys.argv) == 1:
     print("Il manque les arguments (fichier yaml et value_it), voir README.")
-    sys.exit(10)
+    sys.exit(8)
   # Valeur de value_it par défaut si jamais l'argument n'est pas définie
   elif len(sys.argv) == 2:
     print("Valeur par défaut pour value_it")
@@ -163,7 +163,7 @@ if __name__ == "__main__":
   # Test si le fichier de configuraiton existe
   if not(os.path.isfile(sys.argv[1])):
     print("Erreur : le fichier de configuration n'existe pas") 
-    sys.exit(11)
+    sys.exit(9)
   yaml_file = sys.argv[1]
 
   
