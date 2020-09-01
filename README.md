@@ -104,3 +104,7 @@ En cas d'erreur lors de l'exécution du script, un code d'erreur spécifique est
 * 9 : Le fichier de configuration passé en paramètre n'existe pas ;
 
 ## Exemple d'usage
+
+Ouvrir un terminal et exécutez le script de la manière suivante avec value_it qui vaut 0 :
+
+> python backup_website.py config_file.yaml 0
