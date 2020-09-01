@@ -121,7 +121,7 @@ def export_backup(name_list, tar):
 
   # Exécution de la commande scp avec un timeout de 30 secondes 
   try:
-    output = check_output(["scp", fichier, user+"@"+ip_addr+":"+directory], stderr=STDOUT, timeout=30)
+    output = check_output(["scp", "-B", fichier, user+"@"+ip_addr+":"+directory], stderr=STDOUT, timeout=30)
   except subprocess.CalledProcessError:
     print("Erreur lors de l'export du backup vers "+ip_addr)
     sys.exit(6)
