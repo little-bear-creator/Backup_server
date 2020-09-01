@@ -19,7 +19,7 @@ Le script doit être exécuté sous Linux avec une distribution Debian/Ubuntu. A
 
 ## Configuration du fichier yaml
 
-Le fichier de configuration passé en paramètre doit être rédigé en yaml et être composé de trois listes. Il ne faut pas modifier le nom de ces listes ainsi que le nom des clés, seules les valeurs associées peuvent être modifiées si nécessaire. Le fichier "config_example.yaml" présent dans le dépôt peut être remplis et utilisés selon vos besoins.
+Le fichier de configuration passé en paramètre doit être rédigé en yaml et être composé de trois listes. Il ne faut pas modifier le nom de ces listes ainsi que le nom des clés, seules les valeurs associées peuvent être modifiées si nécessaire. Le fichier "config_example.yaml" présent dans le dépôt peut être remplis et utilisé selon vos besoins.
 
 **La première liste** permet de renseigner le chemin vers le dossier contenant tous les sous-dossiers et fichiers du site web à sauvegarder. Sont aussi renseigné, le nom de l'archive, son extension et le mode d'archivage, exemple :
 
@@ -52,6 +52,55 @@ Avant de lancer le script, il faut établir une connexion ssh sécurisée vers l
 
 **Connexion SSH sécurisée**
 
+_Installation du paquet_
 
+Tout d'abord, il faut installer openssh server sur votre serveur distant. Ouvrir un terminal sur ce serveur, se connecter à un utilisateur ayant des droits sudo et exécuter la commande :
+> sudo apt-get install openssh-server
+
+Puis autoriser le service ssh :
+
+> sudo systemctl enable ssh
+
+> sudo systemctl start ssh
+
+Une fois ces configurations faites, tester la connexion ssh depuis une machine vers le serveur avec la commande :
+
+> ssh user@server_ip
+
+_Echange de clé_
+
+Pour l'envoi de la sauvegarde vers le serveur backup, il faut établir une connection SSH sécurisée. Pour ce faire, il faut établir un échange de clé RSA entre les deux machines et nous allons commencer par créer une paire de clé RSA avec la commande suivante, il ne faut pas lui attribuer de passphrase :
+
+> ssh-keygen -t rsa
+
+Ensuite il faut copier la clé sur le serveur distant avec la commande suivante :
+
+> ssh-copy-id UserName@Server_IP
+
+La connection avec échange de clé est maintenant établie, le transfert de fichier via ssh peut fonctionner sans demande de mot de passe.
 
 **Login Mariadb**
+
+La connection à la base de données MariaDB se fait avec un utilisateur ayant des droits admin sur la base de données. Pour pouvoir lancer le script sans demande de mot de passe, il suffit de créer le fichier _"~/.my.cnf"_ et d'y écrire le texte suivant, avec le nom d'utilisateur admin et son mot de passe : 
+
+> [mysqldump]
+> <br/>user=mysqluser
+> <br/>password=secret
+
+Le script peut maintenant être exécuté sans demande de mot de passe, faites bien attention à ce que le nom d'utilisateur défini dans ce fichier soit le même que celui indiqué dans le fichier de configuration yaml avec la clé "db_user".
+
+## Code d'erreur retourné
+
+En cas d'erreur lors de l'exécution du script, un code d'erreur spécifique est retourné et le script est arrêté. Leur signification est expliquée ci-dessous :
+
+* 1 : Erreur lors de l'ouverture du fichier de configuration yaml, sa lecture a échouée ;
+* 2 : Erreur lors de la création de l'archive, accès à un dossier ou fichier impossible ;
+* 3 : CompressionError, la méthode de compression définie n'est pas supportée ;
+* 4 : Erreur innatendue lors de la création de l'archive ;
+* 5 : Erreur lors de la création du dump, voir le datacode retourné par mysqldump ;
+* 6 : Erreur lors de l'export de l'archive vers le serveur distant, la commande _scp_ a échoué ;
+* 7 : Timeout lors de l'export de l'archive, vérifier l'adresse ip indiquée et le nom d'utilisateur ;
+* 8 : Aucun argument assigné en paramètre lors de l'exécution du script ;
+* 9 : Le fichier de configuration passé en paramètre n'existe pas ;
+
+## Exemple d'usage
