@@ -1,0 +1,18 @@
+web_configuration:
+  web_path: /var/www/moodle
+  tarfile: MoodleArchive_
+  web_ext: .tar.gz
+  mode: w|gz
+
+db_configuration:
+  back_name: db_moodle
+  db_name: moodle
+  back_path: /root/Copy/Dump
+  back_ext: .sql
+  db_user: moodleuser
+
+transfert:
+  backup_user: username_of_distant_server 
+  server_ip: ip_adress_of_distant_server 
+  port: 22
+  directory: /path/to/your/distant/backup/folder
